@@ -78,7 +78,7 @@ namespace Updater2
                     newversion = File.ReadAllText(exepath + "\\version.txt");
                 else
                 {
-                    Uri urlv = new Uri("http://ds4windows.com/Files/Builds/newest.txt");
+                    Uri urlv = new Uri("http://23.239.26.40/ds4windows/files/builds/newest.txt");
                     //Sorry other devs, gonna have to find your own server
                     WebClient wc2 = new WebClient();
                     downloading = true;
@@ -88,7 +88,7 @@ namespace Updater2
                 }             
                 if (!downloading && version.Replace(',', '.').CompareTo(newversion) == -1)
                 {
-                    Uri url = new Uri($"http://github.com/Jays2Kings/DS4Windows/releases/download/v{newversion}/DS4Windows.zip");
+                    Uri url = new Uri($"http://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_v{newversion}.zip");
                     sw.Start();
                     try { wc.DownloadFileAsync(url, exepath + "\\Update.zip"); }
                     catch (Exception e) { label1.Content = e.Message; }
@@ -115,8 +115,8 @@ namespace Updater2
             File.Delete(exepath + "\\version.txt");
             if (version.Replace(',', '.').CompareTo(newversion) == -1)
             {
-                Uri url = new Uri($"http://github.com/Jays2Kings/DS4Windows/releases/download/v{newversion}/DS4Windows.zip");
-                //Uri url = new Uri("http://ds4windows.com/Files/Builds/DS4Windows%20-%20J2K%20(v" + newversion + ").zip");
+                Uri url = new Uri($"http://github.com/Jays2Kings/Ryochan7/releases/download/v{newversion}/DS4Windows_v{newversion}.zip");
+                //Uri url = new Uri("http://23.239.26.40/ds4windows/files/builds/DS4Windows%20-%20J2K%20(v" + newversion + ").zip");
                 sw.Start();
                 try { wc.DownloadFileAsync(url, exepath + "\\Update.zip"); }
                 catch (Exception ec) { label1.Content = ec.Message; }
@@ -299,7 +299,7 @@ namespace Updater2
             }
             else if (!backup)
             {
-                Uri url = new Uri($"http://ds4windows.com/DS4Windows.zip");
+                Uri url = new Uri($"http://23.239.26.40/ds4windows/files/DS4Windows.zip");
                 sw.Start();
                 try { wc.DownloadFileAsync(url, exepath + "\\Update.zip"); }
                 catch (Exception ex) { label1.Content = ex.Message; }
@@ -320,7 +320,7 @@ namespace Updater2
 
         private void btnChangelog_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("https://docs.google.com/document/d/1l4xcgVQkGUskc5CQ0p069yW22Cd5WAH_yE3Fz2hXo0E/edit?usp=sharing");
+            Process.Start("https://docs.google.com/document/d/1CovpH08fbPSXrC6TmEprzgPwCe0tTjQ_HTFfDotpmxk/edit?usp=sharing");
         }
 
         private void btnOpenDS4_Click(object sender, RoutedEventArgs e)
