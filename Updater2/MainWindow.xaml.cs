@@ -267,9 +267,9 @@ namespace Updater2
                     File.Delete(path + "\\version.txt");
                 }
                 catch { }
-                if (File.Exists(exepath + "\\Update Files\\DS4Updater NEW.exe"))
-                    File.Move(exepath + "\\Update Files\\DS4Updater NEW.exe", exepath + "\\Update Files\\DS4Updater.exe");
-                string[] files = Directory.GetFiles(exepath + "\\Update Files");
+                if (File.Exists(exepath + "\\Update Files\\DS4Windows\\DS4Updater NEW.exe"))
+                    File.Move(exepath + "\\Update Files\\DS4Windows\\DS4Updater NEW.exe", exepath + "\\Update Files\\DS4Windows\\DS4Updater.exe");
+                string[] files = Directory.GetFiles(exepath + "\\Update Files\\DS4Windows");
                 for (int i = files.Length - 1; i >= 0; i--)
                     if (System.IO.Path.GetFileNameWithoutExtension(files[i]) != "DS4Updater")
                         File.Move(files[i], $"{exepath}\\{System.IO.Path.GetFileName(files[i])}");

@@ -56,10 +56,10 @@ namespace Updater2
         this.Exit += (s, e) =>
                 {
                     string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
-                    if (!openingDS4W && File.Exists(exepath + "\\Update Files\\DS4Updater.exe")
-                        && FileVersionInfo.GetVersionInfo(exepath + "\\Update Files\\DS4Updater.exe").FileVersion.CompareTo(version) == 1)
+                    if (!openingDS4W && File.Exists(exepath + "\\Update Files\\DS4Windows\\DS4Updater.exe")
+                        && FileVersionInfo.GetVersionInfo(exepath + "\\Update Files\\DS4Windows\\DS4Updater.exe").FileVersion.CompareTo(version) == 1)
                     {
-                        File.Move(exepath + "\\Update Files\\DS4Updater.exe", exepath + "\\DS4Updater NEW.exe");
+                        File.Move(exepath + "\\Update Files\\DS4Windows\\DS4Updater.exe", exepath + "\\DS4Updater NEW.exe");
                         Directory.Delete(exepath + "\\Update Files", true);
                         StreamWriter w = new StreamWriter(exepath + "\\UpdateReplacer.bat");
                         w.WriteLine("@echo off"); // Turn off echo
