@@ -38,8 +38,9 @@ namespace Updater2
         protected XmlDocument m_Xdoc = new XmlDocument();
         protected string m_Profile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Tool\\Profiles.xml";
         private int round = 1;
-        public bool downloadLang = true;
+        public bool downloadLang = false;
         private bool backup;
+
         public bool AdminNeeded()
         {
             try
@@ -59,6 +60,7 @@ namespace Updater2
             InitializeComponent();
             if (File.Exists(exepath + "\\DS4Windows.exe"))
                 version = FileVersionInfo.GetVersionInfo(exepath + "\\DS4Windows.exe").FileVersion;
+
             if (AdminNeeded())
                 label1.Content = "Please re-run with admin rights";
             else
@@ -70,8 +72,10 @@ namespace Updater2
                         Directory.Delete(exepath + "\\Update Files", true);
                 }
                 catch (IOException) { label1.Content = "Cannot save download at this time"; return; }
+
                 if (File.Exists(exepath + "\\Profiles.xml"))
                     path = exepath;
+
                 if (File.Exists(path + "\\version.txt"))
                     newversion = File.ReadAllText(path + "\\version.txt");
                 else if (File.Exists(exepath + "\\version.txt"))
@@ -85,7 +89,8 @@ namespace Updater2
                     subwc.DownloadFileAsync(urlv, exepath + "\\version.txt");
                     subwc.DownloadFileCompleted += subwc_DownloadFileCompleted;
                     label1.Content = "Getting Update info";
-                }             
+                }
+
                 if (!downloading && version.Replace(',', '.').CompareTo(newversion) == -1)
                 {
                     Uri url = new Uri($"http://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_v{newversion}.zip");
@@ -155,13 +160,16 @@ namespace Updater2
                 label2.Content = (int)timeleft / 60 + "m left";
             else
                 label2.Content = (int)timeleft + "s left";
+
             UpdaterBar.Value = e.ProgressPercentage;
             TaskbarItemInfo.ProgressValue = UpdaterBar.Value / 106d;
             string convertedrev, convertedtotal;
             if (e.BytesReceived > 1024 * 1024 * 5) convertedrev = (int)(e.BytesReceived / 1024d / 1024d) + "MB";
             else convertedrev = (int)(e.BytesReceived / 1024d) + "kB";
+
             if (e.TotalBytesToReceive > 1024 * 1024 * 5) convertedtotal = (int)(e.TotalBytesToReceive / 1024d / 1024d) + "MB";
             else convertedtotal = (int)(e.TotalBytesToReceive / 1024d) + "kB";
+
             if (round == 1) label1.Content = "Downloading update: " + convertedrev + " / " + convertedtotal;
             else label1.Content = "Downloading Laugauge Pack: " + convertedrev + " / " + convertedtotal;
         }
@@ -210,11 +218,13 @@ namespace Updater2
                     }
                 }
             }
+
             if (new FileInfo(exepath + "\\Update.zip").Length > 0)
             {
                 Process[] processes = Process.GetProcessesByName("DS4Windows");
                 label1.Content = "Download Complete";
                 if (processes.Length > 0)
+                {
                     if (MessageBox.Show("It will be closed to continue this update.", "DS4Windows is still running", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation) == MessageBoxResult.OK)
                     {
                         label1.Content = "Deleting old files";
@@ -227,12 +237,15 @@ namespace Updater2
                         this.Close();
                         return;
                     }
+                }
+
                 while (processes.Length > 0)
                 {
                     label1.Content = "Waiting for DS4Windows to close";
                     processes = Process.GetProcessesByName("DS4Windows");
                     System.Threading.Thread.Sleep(10);
                 }
+
                 label2.Opacity = 0;
                 label1.Content = "Deleting old files";
                 UpdaterBar.Value = 102;
@@ -247,32 +260,51 @@ namespace Updater2
                     File.Delete(exepath + "\\HidLibrary.dll");
                     Directory.Delete(exepath + "\\Update Files");
                     string[] updatefiles = Directory.GetFiles(exepath);
-                    for (int i = 0; i < updatefiles.Length; i++)
+                    for (int i = 0, arlen = updatefiles.Length; i < arlen; i++)
+                    {
                         if (System.IO.Path.GetExtension(updatefiles[i]) == ".ds4w")
                             File.Delete(updatefiles[i]);
+                    }
                 }
                 catch { }
+
                 label1.Content = "Installing new files";
                 UpdaterBar.Value = 104;
                 TaskbarItemInfo.ProgressValue = UpdaterBar.Value / 106d;
+
                 try
                 {
                     Directory.CreateDirectory(exepath + "\\Update Files");
                     ZipFile.ExtractToDirectory(exepath + "\\Update.zip", exepath + "\\Update Files");
                 }
                 catch (IOException) { }
+
                 try
                 {
                     File.Delete(exepath + "\\version.txt");
                     File.Delete(path + "\\version.txt");
                 }
                 catch { }
+
                 if (File.Exists(exepath + "\\Update Files\\DS4Windows\\DS4Updater NEW.exe"))
                     File.Move(exepath + "\\Update Files\\DS4Windows\\DS4Updater NEW.exe", exepath + "\\Update Files\\DS4Windows\\DS4Updater.exe");
+
                 string[] files = Directory.GetFiles(exepath + "\\Update Files\\DS4Windows");
+
                 for (int i = files.Length - 1; i >= 0; i--)
+                {
                     if (System.IO.Path.GetFileNameWithoutExtension(files[i]) != "DS4Updater")
-                        File.Move(files[i], $"{exepath}\\{System.IO.Path.GetFileName(files[i])}");
+                    {
+                        string tempDestPath = $"{exepath}\\{System.IO.Path.GetFileName(files[i])}";
+                        if (File.Exists(tempDestPath))
+                        {
+                            File.Delete(tempDestPath);
+                        }
+
+                        File.Move(files[i], tempDestPath);
+                    }
+                }
+
                 string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
                 /*if (File.Exists(exepath + "\\Update Files\\DS4Updater.exe")
                     && FileVersionInfo.GetVersionInfo(exepath + "\\Update Files\\DS4Updater.exe").FileVersion.CompareTo(version) != 1)
@@ -280,8 +312,10 @@ namespace Updater2
                     File.Delete(exepath + "\\Update Files\\DS4Updater.exe");
                     Directory.Delete(exepath + "\\Update Files");
                 }*/
+
+                string ds4winversion = FileVersionInfo.GetVersionInfo(exepath + "\\DS4Windows.exe").FileVersion;
                 if ((File.Exists(exepath + "\\DS4Windows.exe") || File.Exists(exepath + "\\DS4Tool.exe")) &&
-                    FileVersionInfo.GetVersionInfo(exepath + "\\DS4Windows.exe").FileVersion == newversion)
+                    ds4winversion == newversion.Trim())
                 {
                     File.Delete(exepath + "\\Update.zip");
                     File.Delete(exepath + "\\" + lang + ".zip");
@@ -293,6 +327,7 @@ namespace Updater2
                 }
                 else
                     label1.Content = "Could not unpack zip, please manually unzip";
+
                 UpdaterBar.Value = 106;
                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
                 btnOpenDS4.IsEnabled = true;
@@ -329,6 +364,7 @@ namespace Updater2
                 Process.Start(exepath + "\\DS4Windows.exe");
             else
                 Process.Start(exepath);
+
             App.openingDS4W = true;
             this.Close();
         }
