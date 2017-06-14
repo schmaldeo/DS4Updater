@@ -77,9 +77,15 @@ namespace Updater2
                     path = exepath;
 
                 if (File.Exists(path + "\\version.txt"))
+                {
                     newversion = File.ReadAllText(path + "\\version.txt");
+                    newversion = newversion.Trim();
+                }
                 else if (File.Exists(exepath + "\\version.txt"))
+                {
                     newversion = File.ReadAllText(exepath + "\\version.txt");
+                    newversion = newversion.Trim();
+                }
                 else
                 {
                     Uri urlv = new Uri("http://23.239.26.40/ds4windows/files/builds/newest.txt");
@@ -117,6 +123,7 @@ namespace Updater2
         void subwc_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
             newversion = File.ReadAllText(exepath + "\\version.txt");
+            newversion = newversion.Trim();
             File.Delete(exepath + "\\version.txt");
             if (version.Replace(',', '.').CompareTo(newversion) == -1)
             {
