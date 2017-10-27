@@ -40,6 +40,8 @@ namespace Updater2
         private int round = 1;
         public bool downloadLang = false;
         private bool backup;
+        internal const string arch = "x64";
+        //internal const string arch = "x86";
 
         public bool AdminNeeded()
         {
@@ -99,7 +101,7 @@ namespace Updater2
 
                 if (!downloading && version.Replace(',', '.').CompareTo(newversion) == -1)
                 {
-                    Uri url = new Uri($"http://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_v{newversion}.zip");
+                    Uri url = new Uri($"http://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
                     sw.Start();
                     try { wc.DownloadFileAsync(url, exepath + "\\Update.zip"); }
                     catch (Exception e) { label1.Content = e.Message; }
@@ -127,7 +129,7 @@ namespace Updater2
             File.Delete(exepath + "\\version.txt");
             if (version.Replace(',', '.').CompareTo(newversion) == -1)
             {
-                Uri url = new Uri($"http://github.com/Jays2Kings/Ryochan7/releases/download/v{newversion}/DS4Windows_v{newversion}.zip");
+                Uri url = new Uri($"http://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
                 //Uri url = new Uri("http://23.239.26.40/ds4windows/files/builds/DS4Windows%20-%20J2K%20(v" + newversion + ").zip");
                 sw.Start();
                 try { wc.DownloadFileAsync(url, exepath + "\\Update.zip"); }
@@ -341,7 +343,9 @@ namespace Updater2
             }
             else if (!backup)
             {
-                Uri url = new Uri($"http://23.239.26.40/ds4windows/files/DS4Windows.zip");
+                Uri url = arch.Equals("x64") ? new Uri($"http://23.239.26.40/ds4windows/files/DS4Windows.zip") :
+                    new Uri($"http://23.239.26.40/ds4windows/files/DS4Windows_{arch}.zip");
+
                 sw.Start();
                 try { wc.DownloadFileAsync(url, exepath + "\\Update.zip"); }
                 catch (Exception ex) { label1.Content = ex.Message; }
