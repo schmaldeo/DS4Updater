@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("DS4Updater")]
-[assembly: AssemblyCopyright("Copyright © Jays2Kings 2014, 2015")]
+[assembly: AssemblyCopyright("Copyright © Jays2Kings 2014, 2015; Ryochan7 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
