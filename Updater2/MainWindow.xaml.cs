@@ -29,8 +29,7 @@ namespace Updater2
         private int round = 1;
         public bool downloadLang = false;
         private bool backup;
-        internal const string arch = "x64";
-        //internal const string arch = "x86";
+        internal string arch = Environment.Is64BitProcess ? "x64" : "x86";
 
         public bool AdminNeeded()
         {
