@@ -61,7 +61,7 @@ namespace Updater2
 
                     for (int i = 0, arlen = files.Length; i < arlen; i++)
                     {
-                        string tempFile = System.IO.Path.GetFileName(files[i]);
+                        string tempFile = Path.GetFileName(files[i]);
                         if (new Regex(@"DS4Windows_[\w.]+_\w+.zip").IsMatch(tempFile))
                         {
                             File.Delete(files[i]);
@@ -227,7 +227,7 @@ namespace Updater2
                     string[] updatefiles = Directory.GetFiles(exepath);
                     for (int i = 0, arlen = updatefiles.Length; i < arlen; i++)
                     {
-                        if (System.IO.Path.GetExtension(updatefiles[i]) == ".ds4w")
+                        if (Path.GetExtension(updatefiles[i]) == ".ds4w")
                             File.Delete(updatefiles[i]);
                     }
                 }
@@ -255,9 +255,9 @@ namespace Updater2
 
                 for (int i = files.Length - 1; i >= 0; i--)
                 {
-                    if (System.IO.Path.GetFileNameWithoutExtension(files[i]) != "DS4Updater")
+                    if (Path.GetFileNameWithoutExtension(files[i]) != "DS4Updater")
                     {
-                        string tempDestPath = $"{exepath}\\{System.IO.Path.GetFileName(files[i])}";
+                        string tempDestPath = $"{exepath}\\{Path.GetFileName(files[i])}";
                         if (File.Exists(tempDestPath))
                         {
                             File.Delete(tempDestPath);
