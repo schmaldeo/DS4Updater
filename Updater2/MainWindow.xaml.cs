@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Shell;
 using System.Xml;
 using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
 
 namespace Updater2
 {
@@ -29,7 +30,14 @@ namespace Updater2
         private int round = 1;
         public bool downloadLang = false;
         private bool backup;
+        private string downloadsFolder = "";
+        private string outputUpdatePath = "";
         internal string arch = Environment.Is64BitProcess ? "x64" : "x86";
+
+        [DllImport("Shell32.dll")]
+        private static extern int SHGetKnownFolderPath(
+        [MarshalAs(UnmanagedType.LPStruct)]Guid rfid, uint dwFlags, IntPtr hToken,
+        out IntPtr ppszPath);
 
         public bool AdminNeeded()
         {
@@ -73,6 +81,8 @@ namespace Updater2
                 }
                 catch (IOException) { label1.Content = "Cannot save download at this time"; return; }
 
+                downloadsFolder = checkForDownloadsFolder();
+
                 if (File.Exists(exepath + "\\Profiles.xml"))
                     path = exepath;
 
@@ -101,7 +111,9 @@ namespace Updater2
                 {
                     Uri url = new Uri($"http://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
                     sw.Start();
-                    try { wc.DownloadFileAsync(url, exepath + $"\\DS4Windows_{newversion}_{arch}.zip"); }
+                    outputUpdatePath = !string.IsNullOrEmpty(downloadsFolder) ? downloadsFolder + $"\\DS4Windows_{newversion}_{arch}.zip" :
+                        exepath + $"\\DS4Windows_{newversion}_{arch}.zip";
+                    try { wc.DownloadFileAsync(url, outputUpdatePath); }
                     catch (Exception e) { label1.Content = e.Message; }
                     wc.DownloadFileCompleted += wc_DownloadFileCompleted;
                     wc.DownloadProgressChanged += wc_DownloadProgressChanged;
@@ -120,6 +132,19 @@ namespace Updater2
             }
         }
 
+        string checkForDownloadsFolder()
+        {
+            string result = string.Empty;
+            IntPtr outPath;
+            int pathResult = SHGetKnownFolderPath(new Guid("{374DE290-123F-4565-9164-39C4925E467B}"), 0x00004000, new IntPtr(0), out outPath);
+            if (pathResult >= 0)
+            {
+                result = Marshal.PtrToStringUni(outPath);
+            }
+
+            return result;
+        }
+
         void subwc_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
             newversion = File.ReadAllText(exepath + "\\version.txt");
@@ -129,7 +154,9 @@ namespace Updater2
             {
                 Uri url = new Uri($"http://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
                 sw.Start();
-                try { wc.DownloadFileAsync(url, exepath + $"\\DS4Windows_{newversion}_{arch}.zip"); }
+                outputUpdatePath = !string.IsNullOrEmpty(downloadsFolder) ? downloadsFolder + $"\\DS4Windows_{newversion}_{arch}.zip" :
+                        exepath + $"\\DS4Windows_{newversion}_{arch}.zip";
+                try { wc.DownloadFileAsync(url, outputUpdatePath); }
                 catch (Exception ec) { label1.Content = ec.Message; }
                 wc.DownloadFileCompleted += wc_DownloadFileCompleted;
                 wc.DownloadProgressChanged += wc_DownloadProgressChanged;
@@ -185,7 +212,7 @@ namespace Updater2
             sw.Reset();
             string lang = CultureInfo.CurrentCulture.ToString();
 
-            if (new FileInfo(exepath + $"\\DS4Windows_{newversion}_{arch}.zip").Length > 0)
+            if (new FileInfo(outputUpdatePath).Length > 0)
             {
                 Process[] processes = Process.GetProcessesByName("DS4Windows");
                 label1.Content = "Download Complete";
@@ -240,7 +267,7 @@ namespace Updater2
                 try
                 {
                     Directory.CreateDirectory(exepath + "\\Update Files");
-                    ZipFile.ExtractToDirectory(exepath + $"\\DS4Windows_{newversion}_{arch}.zip", exepath + "\\Update Files");
+                    ZipFile.ExtractToDirectory(outputUpdatePath, exepath + "\\Update Files");
                 }
                 catch (IOException) { }
 
@@ -267,7 +294,6 @@ namespace Updater2
                     }
                 }
 
-                string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
                 string ds4winversion = FileVersionInfo.GetVersionInfo(exepath + "\\DS4Windows.exe").FileVersion;
                 if ((File.Exists(exepath + "\\DS4Windows.exe") || File.Exists(exepath + "\\DS4Tool.exe")) &&
                     ds4winversion == newversion.Trim())
@@ -293,7 +319,9 @@ namespace Updater2
                     new Uri($"http://23.239.26.40/ds4windows/files/DS4Windows_{arch}.zip");
 
                 sw.Start();
-                try { wc.DownloadFileAsync(url, exepath + $"\\DS4Windows_{newversion}_{arch}.zip"); }
+                outputUpdatePath = !string.IsNullOrEmpty(downloadsFolder) ? downloadsFolder + $"\\DS4Windows_{newversion}_{arch}.zip" :
+                        exepath + $"\\DS4Windows_{newversion}_{arch}.zip";
+                try { wc.DownloadFileAsync(url, outputUpdatePath); }
                 catch (Exception ex) { label1.Content = ex.Message; }
                 backup = true;
             }
