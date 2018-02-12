@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Windows;
-using System.Xml;
 
 namespace Updater2
 {
@@ -18,37 +17,22 @@ namespace Updater2
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             MainWindow mwd = new MainWindow();
-            if (e.Args.Length == 1)
+            for (int i=0, arlen = e.Args.Length; i < arlen; i++)
             {
-                if (e.Args[0].Contains("-skipLang"))
+                string temp = e.Args[i];
+                if (temp.Contains("-skipLang"))
                     mwd.downloadLang = false;
+                else if (temp.Equals("-autolaunch"))
+                    mwd.autoLaunchDS4W = true;
             }
-            else if (!CultureInfo.CurrentCulture.ToString().StartsWith("en"))
-            {
-                try
-                {
-                    string m_Profile;
-                    if (File.Exists(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName + "\\Profiles.xml"))
-                        m_Profile = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName + "\\Profiles.xml";
-                    else
-                        m_Profile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Windows\\Auto Profiles.xml";
-                    if (File.Exists(m_Profile))
-                    {
-                        XmlDocument m_Xdoc = new XmlDocument();
-                        m_Xdoc.Load(m_Profile);
-                        XmlNode Item = m_Xdoc.SelectSingleNode("/Profile/DownloadLang");
-                        bool.TryParse(Item.InnerText, out mwd.downloadLang);
-                    }
-                }
-                catch { }
-            }
+
             mwd.Show();
         }
 
         public App()
         {
-        //Console.WriteLine(CultureInfo.CurrentCulture);
-        this.Exit += (s, e) =>
+            //Console.WriteLine(CultureInfo.CurrentCulture);
+            this.Exit += (s, e) =>
                 {
                     string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
                     if (!openingDS4W && File.Exists(exepath + "\\Update Files\\DS4Windows\\DS4Updater.exe")

@@ -9,7 +9,6 @@ using System.Reflection;
 using System.Security.Principal;
 using System.Windows;
 using System.Windows.Shell;
-using System.Xml;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 
@@ -20,18 +19,18 @@ namespace Updater2
     /// </summary>
     public partial class MainWindow : Window
     {
-        WebClient wc = new WebClient(), subwc = new WebClient(), langwc = new WebClient();
+        WebClient wc = new WebClient(), subwc = new WebClient();
         protected string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Tool";
         string exepath = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
         string version = "0", newversion = "0";
         bool downloading = false;
-        protected XmlDocument m_Xdoc = new XmlDocument();
         protected string m_Profile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Tool\\Profiles.xml";
         private int round = 1;
         public bool downloadLang = false;
         private bool backup;
         private string downloadsFolder = "";
         private string outputUpdatePath = "";
+        public bool autoLaunchDS4W = false;
         internal string arch = Environment.Is64BitProcess ? "x64" : "x86";
 
         [DllImport("Shell32.dll")]
@@ -171,6 +170,8 @@ namespace Updater2
                 }
                 catch { }
                 btnOpenDS4.IsEnabled = true;
+                if (autoLaunchDS4W)
+                    AutoOpenDS4();
             }
         }
 
@@ -312,6 +313,8 @@ namespace Updater2
                 UpdaterBar.Value = 106;
                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
                 btnOpenDS4.IsEnabled = true;
+                if (autoLaunchDS4W)
+                    AutoOpenDS4();
             }
             else if (!backup)
             {
@@ -338,12 +341,23 @@ namespace Updater2
             }
         }
 
-        private void btnChangelog_Click(object sender, RoutedEventArgs e)
+        private void BtnChangelog_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("https://docs.google.com/document/d/1CovpH08fbPSXrC6TmEprzgPwCe0tTjQ_HTFfDotpmxk/edit?usp=sharing");
         }
 
-        private void btnOpenDS4_Click(object sender, RoutedEventArgs e)
+        private void BtnOpenDS4_Click(object sender, RoutedEventArgs e)
+        {
+            if (File.Exists(exepath + "\\DS4Windows.exe"))
+                Process.Start(exepath + "\\DS4Windows.exe");
+            else
+                Process.Start(exepath);
+
+            App.openingDS4W = true;
+            this.Close();
+        }
+
+        private void AutoOpenDS4()
         {
             if (File.Exists(exepath + "\\DS4Windows.exe"))
                 Process.Start(exepath + "\\DS4Windows.exe");
