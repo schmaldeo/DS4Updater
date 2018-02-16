@@ -170,14 +170,19 @@ namespace Updater2
                     File.Delete(exepath + "\\version.txt");
                 }
                 catch { }
-                btnOpenDS4.IsEnabled = true;
+
                 if (autoLaunchDS4W)
                 {
                     label1.Content = "Launching DS4Windows soon";
+                    btnOpenDS4.IsEnabled = false;
                     Task.Delay(5000).ContinueWith((t) =>
                     {
                         AutoOpenDS4();
                     });
+                }
+                else
+                {
+                    btnOpenDS4.IsEnabled = true;
                 }
             }
         }
@@ -319,14 +324,19 @@ namespace Updater2
 
                 UpdaterBar.Value = 106;
                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
-                btnOpenDS4.IsEnabled = true;
+
                 if (autoLaunchDS4W)
                 {
                     label1.Content = "Launching DS4Windows soon";
+                    btnOpenDS4.IsEnabled = false;
                     Task.Delay(5000).ContinueWith((t) =>
                     {
                         AutoOpenDS4();
                     });
+                }
+                else
+                {
+                    btnOpenDS4.IsEnabled = true;
                 }
             }
             else if (!backup)
