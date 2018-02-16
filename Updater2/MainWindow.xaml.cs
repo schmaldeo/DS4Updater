@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Shell;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Updater2
 {
@@ -171,7 +172,13 @@ namespace Updater2
                 catch { }
                 btnOpenDS4.IsEnabled = true;
                 if (autoLaunchDS4W)
-                    AutoOpenDS4();
+                {
+                    label1.Content = "Launching DS4Windows soon";
+                    Task.Delay(5000).ContinueWith((t) =>
+                    {
+                        AutoOpenDS4();
+                    });
+                }
             }
         }
 
@@ -314,7 +321,13 @@ namespace Updater2
                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
                 btnOpenDS4.IsEnabled = true;
                 if (autoLaunchDS4W)
-                    AutoOpenDS4();
+                {
+                    label1.Content = "Launching DS4Windows soon";
+                    Task.Delay(5000).ContinueWith((t) =>
+                    {
+                        AutoOpenDS4();
+                    });
+                }
             }
             else if (!backup)
             {
@@ -365,7 +378,10 @@ namespace Updater2
                 Process.Start(exepath);
 
             App.openingDS4W = true;
-            this.Close();
+            Dispatcher.BeginInvoke((Action)(() =>
+            {
+                this.Close();
+            }));
         }
     }
 }
