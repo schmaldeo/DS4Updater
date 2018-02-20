@@ -21,11 +21,10 @@ namespace Updater2
     public partial class MainWindow : Window
     {
         WebClient wc = new WebClient(), subwc = new WebClient();
-        protected string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Tool";
+        protected string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Windows";
         string exepath = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
         string version = "0", newversion = "0";
         bool downloading = false;
-        protected string m_Profile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Tool\\Profiles.xml";
         private int round = 1;
         public bool downloadLang = false;
         private bool backup;
@@ -81,7 +80,7 @@ namespace Updater2
                 }
                 catch (IOException) { label1.Content = "Cannot save download at this time"; return; }
 
-                downloadsFolder = checkForDownloadsFolder();
+                downloadsFolder = CheckForDownloadsFolder();
 
                 if (File.Exists(exepath + "\\Profiles.xml"))
                     path = exepath;
@@ -132,7 +131,7 @@ namespace Updater2
             }
         }
 
-        string checkForDownloadsFolder()
+        string CheckForDownloadsFolder()
         {
             string result = string.Empty;
             IntPtr outPath;
