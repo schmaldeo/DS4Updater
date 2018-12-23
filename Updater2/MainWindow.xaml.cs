@@ -109,7 +109,7 @@ namespace Updater2
                     label1.Content = "Getting Update info";
                 }
 
-                if (!downloading && version.Replace(',', '.').CompareTo(newversion) == -1)
+                if (!downloading && version.Replace(',', '.').CompareTo(newversion) != 0)
                 {
                     Uri url = new Uri($"http://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
                     sw.Start();
@@ -138,7 +138,7 @@ namespace Updater2
             newversion = File.ReadAllText(exepath + "\\version.txt");
             newversion = newversion.Trim();
             File.Delete(exepath + "\\version.txt");
-            if (version.Replace(',', '.').CompareTo(newversion) == -1)
+            if (version.Replace(',', '.').CompareTo(newversion) != 0)
             {
                 Uri url = new Uri($"http://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
                 sw.Start();
