@@ -111,7 +111,7 @@ namespace Updater2
 
                 if (!downloading && version.Replace(',', '.').CompareTo(newversion) != 0)
                 {
-                    Uri url = new Uri($"http://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
+                    Uri url = new Uri($"https://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
                     sw.Start();
                     outputUpdatePath = Path.Combine(updatesFolder, $"DS4Windows_{newversion}_{arch}.zip");
                     try { wc.DownloadFileAsync(url, outputUpdatePath); }
@@ -140,7 +140,7 @@ namespace Updater2
             File.Delete(exepath + "\\version.txt");
             if (version.Replace(',', '.').CompareTo(newversion) != 0)
             {
-                Uri url = new Uri($"http://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
+                Uri url = new Uri($"https://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
                 sw.Start();
                 outputUpdatePath = Path.Combine(updatesFolder, $"DS4Windows_{newversion}_{arch}.zip");
                 try { wc.DownloadFileAsync(url, outputUpdatePath); }
@@ -328,7 +328,7 @@ namespace Updater2
             }
             else if (!backup)
             {
-                Uri url = new Uri($"http://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
+                Uri url = new Uri($"https://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
 
                 sw.Start();
                 outputUpdatePath = Path.Combine(updatesFolder, $"DS4Windows_{newversion}_{arch}.zip");
