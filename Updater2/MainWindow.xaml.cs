@@ -280,13 +280,25 @@ namespace Updater2
                 }
                 catch { }
 
-                string[] files = Directory.GetFiles(exepath + "\\Update Files\\DS4Windows");
+                string[] directories = Directory.GetDirectories(exepath + "\\Update Files\\DS4Windows", "*", SearchOption.AllDirectories);
+                for (int i = directories.Length - 1; i >= 0; i--)
+                {
+                    string relativePath = directories[i].Replace($"{exepath}\\Update Files\\DS4Windows\\", "");
+                    string tempDestPath = Path.Combine(exepath, relativePath);
+                    if (!Directory.Exists(tempDestPath))
+                    {
+                        Directory.CreateDirectory(tempDestPath);
+                    }
+                }
 
+                string[] files = Directory.GetFiles(exepath + "\\Update Files\\DS4Windows", "*", SearchOption.AllDirectories);
                 for (int i = files.Length - 1; i >= 0; i--)
                 {
                     if (Path.GetFileNameWithoutExtension(files[i]) != "DS4Updater")
                     {
-                        string tempDestPath = $"{exepath}\\{Path.GetFileName(files[i])}";
+                        string relativePath = files[i].Replace($"{exepath}\\Update Files\\DS4Windows\\", "");
+                        string tempDestPath = Path.Combine(exepath, relativePath);
+                        //string tempDestPath = $"{exepath}\\{Path.GetFileName(files[i])}";
                         if (File.Exists(tempDestPath))
                         {
                             File.Delete(tempDestPath);
