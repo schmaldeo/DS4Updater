@@ -24,6 +24,10 @@ namespace Updater2
                     mwd.downloadLang = false;
                 else if (temp.Equals("-autolaunch"))
                     mwd.autoLaunchDS4W = true;
+                else if (temp.Equals("-user"))
+                {
+                    mwd.forceLaunchDS4WUser = true;
+                }
             }
 
             mwd.Show();

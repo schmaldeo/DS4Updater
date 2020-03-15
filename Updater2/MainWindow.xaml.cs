@@ -31,6 +31,7 @@ namespace Updater2
         private string outputUpdatePath = "";
         private string updatesFolder = "";
         public bool autoLaunchDS4W = false;
+        public bool forceLaunchDS4WUser = false;
         internal string arch = Environment.Is64BitProcess ? "x64" : "x86";
 
         [DllImport("Shell32.dll")]
@@ -381,10 +382,18 @@ namespace Updater2
 
         private void AutoOpenDS4()
         {
+            string launchExePath = exepath;
             if (File.Exists(exepath + "\\DS4Windows.exe"))
-                Process.Start(exepath + "\\DS4Windows.exe");
+                launchExePath = exepath + "\\DS4Windows.exe";
+
+            if (forceLaunchDS4WUser)
+            {
+                Util.StartProcessInExplorer(launchExePath);
+            }
             else
-                Process.Start(exepath);
+            {
+                Process.Start(launchExePath);
+            }
 
             App.openingDS4W = true;
             Dispatcher.BeginInvoke((Action)(() =>
