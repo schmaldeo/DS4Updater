@@ -67,13 +67,16 @@ namespace Updater2
 
             this.Exit += (s, e) =>
             {
-                // Wait for bat script to finish before launching instance
-                Thread.Sleep(2000);
-                while (!File.Exists(exepath + "\\DS4Updater NEW.exe"))
+                if (openingDS4W)
                 {
-                    Thread.SpinWait(1000);
+                    // Wait for bat script to finish before launching instance
+                    Thread.Sleep(2000);
+                    while (!File.Exists(exepath + "\\DS4Updater NEW.exe"))
+                    {
+                        Thread.SpinWait(1000);
+                    }
+                    AutoOpenDS4();
                 }
-                AutoOpenDS4();
             };
         }
 
