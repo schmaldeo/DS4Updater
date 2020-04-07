@@ -167,7 +167,7 @@ namespace Updater2
                     btnOpenDS4.IsEnabled = false;
                     Task.Delay(5000).ContinueWith((t) =>
                     {
-                        AutoOpenDS4();
+                        PrepareAutoOpenDS4();
                     });
                 }
                 else
@@ -333,7 +333,7 @@ namespace Updater2
                     btnOpenDS4.IsEnabled = false;
                     Task.Delay(5000).ContinueWith((t) =>
                     {
-                        AutoOpenDS4();
+                        PrepareAutoOpenDS4();
                     });
                 }
                 else
@@ -380,21 +380,8 @@ namespace Updater2
             this.Close();
         }
 
-        private void AutoOpenDS4()
+        private void PrepareAutoOpenDS4()
         {
-            string launchExePath = exepath;
-            if (File.Exists(exepath + "\\DS4Windows.exe"))
-                launchExePath = exepath + "\\DS4Windows.exe";
-
-            if (forceLaunchDS4WUser)
-            {
-                Util.StartProcessInExplorer(launchExePath);
-            }
-            else
-            {
-                Process.Start(launchExePath);
-            }
-
             App.openingDS4W = true;
             Dispatcher.BeginInvoke((Action)(() =>
             {

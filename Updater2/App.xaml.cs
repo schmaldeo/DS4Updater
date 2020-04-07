@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
 
 namespace Updater2
@@ -14,9 +15,11 @@ namespace Updater2
     {
         string exepath = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
         public static bool openingDS4W;
+        private MainWindow mwd;
+
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            MainWindow mwd = new MainWindow();
+            mwd = new MainWindow();
             for (int i=0, arlen = e.Args.Length; i < arlen; i++)
             {
                 string temp = e.Args[i];
@@ -39,7 +42,7 @@ namespace Updater2
             this.Exit += (s, e) =>
                 {
                     string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
-                    if (!openingDS4W && File.Exists(exepath + "\\Update Files\\DS4Windows\\DS4Updater.exe")
+                    if (File.Exists(exepath + "\\Update Files\\DS4Windows\\DS4Updater.exe")
                         && FileVersionInfo.GetVersionInfo(exepath + "\\Update Files\\DS4Windows\\DS4Updater.exe").FileVersion.CompareTo(version) != 0)
                     {
                         File.Move(exepath + "\\Update Files\\DS4Windows\\DS4Updater.exe", exepath + "\\DS4Updater NEW.exe");
@@ -53,13 +56,36 @@ namespace Updater2
                         w.WriteLine("@DEL \"%~f0\""); // Attempt to delete myself without opening a time paradox.
                         w.Close();
 
-                        Process.Start(exepath + "\\UpdateReplacer.bat");
+                        Process.Start(exepath + "\\UpdateReplacer.bat").WaitForExit();
                     }
                     else if (File.Exists(exepath + "\\DS4Updater NEW.exe"))
                         File.Delete(exepath + "\\DS4Updater NEW.exe");
-                    if (!openingDS4W && Directory.Exists(exepath + "\\Update Files"))
+
+                    if (Directory.Exists(exepath + "\\Update Files"))
                         Directory.Delete(exepath + "\\Update Files", true);
                 };
+
+            this.Exit += (s, e) =>
+            {
+                // Wait for bat script to finish before launching instance
+                AutoOpenDS4();
+            };
+        }
+
+        private void AutoOpenDS4()
+        {
+            string launchExePath = exepath;
+            if (File.Exists(exepath + "\\DS4Windows.exe"))
+                launchExePath = exepath + "\\DS4Windows.exe";
+
+            if (mwd.forceLaunchDS4WUser)
+            {
+                Util.StartProcessInExplorer(launchExePath);
+            }
+            else
+            {
+                Process.Start(launchExePath);
+            }
         }
     }
 }
