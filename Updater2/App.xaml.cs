@@ -71,7 +71,7 @@ namespace Updater2
                 {
                     // Wait for bat script to finish before launching instance
                     Thread.Sleep(2000);
-                    while (!File.Exists(exepath + "\\DS4Updater NEW.exe"))
+                    while (File.Exists(exepath + "\\DS4Updater NEW.exe"))
                     {
                         Thread.SpinWait(1000);
                     }
