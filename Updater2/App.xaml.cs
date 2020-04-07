@@ -56,7 +56,7 @@ namespace Updater2
                         w.WriteLine("@DEL \"%~f0\""); // Attempt to delete myself without opening a time paradox.
                         w.Close();
 
-                        Process.Start(exepath + "\\UpdateReplacer.bat").WaitForExit();
+                        Process.Start(exepath + "\\UpdateReplacer.bat");
                     }
                     else if (File.Exists(exepath + "\\DS4Updater NEW.exe"))
                         File.Delete(exepath + "\\DS4Updater NEW.exe");
@@ -68,6 +68,11 @@ namespace Updater2
             this.Exit += (s, e) =>
             {
                 // Wait for bat script to finish before launching instance
+                Thread.Sleep(2000);
+                while (!File.Exists(exepath + "\\DS4Updater NEW.exe"))
+                {
+                    Thread.SpinWait(1000);
+                }
                 AutoOpenDS4();
             };
         }
