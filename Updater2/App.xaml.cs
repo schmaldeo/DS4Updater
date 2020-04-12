@@ -5,6 +5,8 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media;
 
 namespace Updater2
 {
@@ -19,6 +21,8 @@ namespace Updater2
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
+
             mwd = new MainWindow();
             for (int i=0, arlen = e.Args.Length; i < arlen; i++)
             {
@@ -69,12 +73,6 @@ namespace Updater2
             {
                 if (openingDS4W)
                 {
-                    // Wait for bat script to finish before launching instance
-                    Thread.Sleep(2000);
-                    while (File.Exists(exepath + "\\DS4Updater NEW.exe"))
-                    {
-                        Thread.SpinWait(1000);
-                    }
                     AutoOpenDS4();
                 }
             };
