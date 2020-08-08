@@ -20,6 +20,7 @@ namespace Updater2
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const string CUSTOM_EXE_CONFIG_FILENAME = "custom_exe_name.txt";
         WebClient wc = new WebClient(), subwc = new WebClient();
         protected string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Windows";
         string exepath = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
@@ -33,6 +34,8 @@ namespace Updater2
         public bool autoLaunchDS4W = false;
         public bool forceLaunchDS4WUser = false;
         internal string arch = Environment.Is64BitProcess ? "x64" : "x86";
+        private string custom_exe_name_path;
+        public string CustomExeNamePath { get => custom_exe_name_path; }
 
         [DllImport("Shell32.dll")]
         private static extern int SHGetKnownFolderPath(
@@ -65,6 +68,8 @@ namespace Updater2
                 label1.Content = "Please re-run with admin rights";
             else
             {
+                custom_exe_name_path = Path.Combine(exepath, CUSTOM_EXE_CONFIG_FILENAME);
+
                 try
                 {
                     string[] files = Directory.GetFiles(exepath);
@@ -185,6 +190,7 @@ namespace Updater2
         }
 
         Stopwatch sw = new Stopwatch();
+
         private void wc_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
             label2.Opacity = 1;
@@ -323,6 +329,27 @@ namespace Updater2
                 }
                 else
                     label1.Content = "Could not unpack zip, please manually unzip";
+
+                // Check for custom exe name setting
+                string custom_exe_name_path = Path.Combine(exepath, CUSTOM_EXE_CONFIG_FILENAME);
+                bool fakeExeFileExists = File.Exists(custom_exe_name_path);
+                if (fakeExeFileExists)
+                {
+                    string fake_exe_name = File.ReadAllText(custom_exe_name_path).Trim();
+                    bool valid = !string.IsNullOrEmpty(fake_exe_name) && !(fake_exe_name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0);
+                    // Attempt to copy executable and assembly config file
+                    if (valid)
+                    {
+                        string current_exe_location = Path.Combine(exepath, "DS4Windows.exe");
+                        string current_conf_file_path = Path.Combine(exepath, "DS4Windows.exe.config");
+
+                        string fake_exe_file = Path.Combine(exepath, $"{fake_exe_name}.exe");
+                        string fake_conf_file = Path.Combine(exepath, $"{fake_exe_name}.exe.config");
+
+                        File.Copy(current_exe_location, fake_exe_file);
+                        File.Copy(current_conf_file_path, fake_conf_file);
+                    }
+                }
 
                 UpdaterBar.Value = 106;
                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;

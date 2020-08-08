@@ -17,6 +17,8 @@ namespace Updater2
     {
         string exepath = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
         public static bool openingDS4W;
+        private string launchExeName;
+        private string launchExePath;
         private MainWindow mwd;
 
         private void Application_Startup(object sender, StartupEventArgs e)
@@ -24,6 +26,7 @@ namespace Updater2
             RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
 
             mwd = new MainWindow();
+            launchExePath = Path.Combine(exepath, "DS4Windows.exe");
             for (int i=0, arlen = e.Args.Length; i < arlen; i++)
             {
                 string temp = e.Args[i];
@@ -34,6 +37,20 @@ namespace Updater2
                 else if (temp.Equals("-user"))
                 {
                     mwd.forceLaunchDS4WUser = true;
+                }
+                else if (temp.Equals("--launchExe"))
+                {
+                    if ((i+1) < arlen)
+                    {
+                        i++;
+                        temp = e.Args[i];
+                        string tempPath = Path.Combine(exepath, temp);
+                        if (File.Exists(tempPath))
+                        {
+                            launchExeName = temp;
+                            launchExePath = tempPath;
+                        }
+                    }
                 }
             }
 
@@ -80,17 +97,19 @@ namespace Updater2
 
         private void AutoOpenDS4()
         {
-            string launchExePath = exepath;
-            if (File.Exists(exepath + "\\DS4Windows.exe"))
-                launchExePath = exepath + "\\DS4Windows.exe";
+            string finalLaunchExePath = exepath;
+            if (File.Exists(launchExePath))
+                finalLaunchExePath = launchExePath;
 
             if (mwd.forceLaunchDS4WUser)
             {
-                Util.StartProcessInExplorer(launchExePath);
+                // Attempt to launch program
+                Util.StartProcessInExplorer(finalLaunchExePath);
             }
             else
             {
-                Process.Start(launchExePath);
+                // Attempt to launch Explorer with folder open
+                Process.Start(finalLaunchExePath);
             }
         }
     }
