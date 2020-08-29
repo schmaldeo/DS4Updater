@@ -346,8 +346,8 @@ namespace Updater2
                         string fake_exe_file = Path.Combine(exepath, $"{fake_exe_name}.exe");
                         string fake_conf_file = Path.Combine(exepath, $"{fake_exe_name}.exe.config");
 
-                        File.Copy(current_exe_location, fake_exe_file);
-                        File.Copy(current_conf_file_path, fake_conf_file);
+                        File.Copy(current_exe_location, fake_exe_file, true);
+                        File.Copy(current_conf_file_path, fake_conf_file, true);
                     }
                 }
 
