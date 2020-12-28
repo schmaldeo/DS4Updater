@@ -252,8 +252,18 @@ namespace Updater2
                 label1.Content = "Deleting old files";
                 UpdaterBar.Value = 102;
                 TaskbarItemInfo.ProgressValue = UpdaterBar.Value / 106d;
+
+                string libsPath = Path.Combine(exepath, "libs");
+                string oldLibsPath = Path.Combine(exepath, "oldlibs");
+
                 try
                 {
+                    // Temporarily move existing libs folder
+                    if (Directory.Exists(libsPath))
+                    {
+                        Directory.Move(libsPath, oldLibsPath);
+                    }
+
                     File.Delete(exepath + "\\DS4Windows.exe");
                     File.Delete(exepath + "\\DS4Tool.exe");
                     File.Delete(exepath + "\\DS4Control.dll");
@@ -313,6 +323,12 @@ namespace Updater2
 
                         File.Move(files[i], tempDestPath);
                     }
+                }
+
+                // Delete old libs folder
+                if (Directory.Exists(oldLibsPath))
+                {
+                    Directory.Delete(oldLibsPath, true);
                 }
 
                 string ds4winversion = FileVersionInfo.GetVersionInfo(exepath + "\\DS4Windows.exe").FileVersion;
