@@ -229,9 +229,19 @@ namespace Updater2
                 {
                     if (MessageBox.Show("It will be closed to continue this update.", "DS4Windows is still running", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation) == MessageBoxResult.OK)
                     {
-                        label1.Content = "Deleting old files";
+                        label1.Content = "Terminating DS4Windows";
                         foreach (Process p in processes)
-                            p.Kill();
+                        {
+                            if (!p.HasExited)
+                            {
+                                try
+                                {
+                                    p.Kill();
+                                }
+                                catch { }
+                            }
+                        }
+
                         System.Threading.Thread.Sleep(5000);
                     }
                     else
