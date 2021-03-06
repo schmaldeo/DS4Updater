@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +28,6 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <WriteLinesToFile File="$(ProjectDir)\newest.txt" Lines="$(Version)" Overwrite="true"/>
+    <WriteLinesToFile File="$(ProjectDir)\newest.txt" Lines="$(Version)" Overwrite="true" />
   </Target>
 </Project>
