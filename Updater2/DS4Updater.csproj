@@ -9,8 +9,8 @@
 
   <PropertyGroup>
     <Product>DS4Updater</Product>
-    <Copyright>Copyright © Jays2Kings 2014, 2015; Ryochan7 2017, 2018, 2019, 2020</Copyright>
-    <Version>1.4.3</Version>
+    <Copyright>Copyright © Jays2Kings 2014, 2015; Ryochan7 2017, 2018, 2019, 2020, 2021</Copyright>
+    <Version>1.4.6</Version>
   </PropertyGroup>
 
   <ItemGroup>

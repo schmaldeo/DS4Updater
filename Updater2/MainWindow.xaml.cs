@@ -60,7 +60,7 @@ namespace Updater2
         {
             InitializeComponent();
 
-            ServicePointManager.SecurityProtocol = (ServicePointManager.SecurityProtocol & SecurityProtocolType.Ssl3) | (SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12);
+            ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
             if (File.Exists(exepath + "\\DS4Windows.exe"))
                 version = FileVersionInfo.GetVersionInfo(exepath + "\\DS4Windows.exe").FileVersion;
 
@@ -229,9 +229,19 @@ namespace Updater2
                 {
                     if (MessageBox.Show("It will be closed to continue this update.", "DS4Windows is still running", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation) == MessageBoxResult.OK)
                     {
-                        label1.Content = "Deleting old files";
+                        label1.Content = "Terminating DS4Windows";
                         foreach (Process p in processes)
-                            p.Kill();
+                        {
+                            if (!p.HasExited)
+                            {
+                                try
+                                {
+                                    p.Kill();
+                                }
+                                catch {  }
+                            }
+                        }
+
                         System.Threading.Thread.Sleep(5000);
                     }
                     else
@@ -252,8 +262,18 @@ namespace Updater2
                 label1.Content = "Deleting old files";
                 UpdaterBar.Value = 102;
                 TaskbarItemInfo.ProgressValue = UpdaterBar.Value / 106d;
+
+                string libsPath = Path.Combine(exepath, "libs");
+                string oldLibsPath = Path.Combine(exepath, "oldlibs");
+
                 try
                 {
+                    // Temporarily move existing libs folder
+                    if (Directory.Exists(libsPath))
+                    {
+                        Directory.Move(libsPath, oldLibsPath);
+                    }
+
                     File.Delete(exepath + "\\DS4Windows.exe");
                     File.Delete(exepath + "\\DS4Tool.exe");
                     File.Delete(exepath + "\\DS4Control.dll");
@@ -313,6 +333,12 @@ namespace Updater2
 
                         File.Move(files[i], tempDestPath);
                     }
+                }
+
+                // Delete old libs folder
+                if (Directory.Exists(oldLibsPath))
+                {
+                    Directory.Delete(oldLibsPath, true);
                 }
 
                 string ds4winversion = FileVersionInfo.GetVersionInfo(exepath + "\\DS4Windows.exe").FileVersion;
