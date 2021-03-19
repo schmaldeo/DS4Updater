@@ -13,6 +13,15 @@
     <Version>1.4.6</Version>
     <AssemblyVersion>1.4.6</AssemblyVersion>
     <FileVersion>1.4.6</FileVersion>
+    <StartupObject>Updater2.App</StartupObject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DefineConstants></DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <DefineConstants></DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,6 +39,6 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <WriteLinesToFile File="$(ProjectDir)\newest.txt" Lines="$(Version)" Overwrite="true" />
+    <Exec Command="GOTO END&#xD;&#xA;&#xD;&#xA;echo @(VersionNumber)&gt; $(ProjectDir)\newest.txt&#xD;&#xA;&#xD;&#xA;:END&#xD;&#xA;" />
   </Target>
 </Project>
