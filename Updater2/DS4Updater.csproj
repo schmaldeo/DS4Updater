@@ -11,6 +11,8 @@
     <Product>DS4Updater</Product>
     <Copyright>Copyright © Jays2Kings 2014, 2015; Ryochan7 2017, 2018, 2019, 2020, 2021</Copyright>
     <Version>1.4.6</Version>
+    <AssemblyVersion>1.4.6</AssemblyVersion>
+    <FileVersion>1.4.6</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
