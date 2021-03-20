@@ -12,6 +12,7 @@ using System.Windows.Shell;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Updater2
 {
@@ -266,6 +267,13 @@ namespace Updater2
                 string libsPath = Path.Combine(exepath, "libs");
                 string oldLibsPath = Path.Combine(exepath, "oldlibs");
 
+                // Grab relative file paths to DLL files in the current install
+                string[] oldDLLFiles = Directory.GetDirectories(exepath, "*.dll", SearchOption.AllDirectories);
+                for (int i = oldDLLFiles.Length - 1; i >= 0; i--)
+                {
+                    oldDLLFiles[i] = oldDLLFiles[i].Replace($"{exepath}", "");
+                }
+
                 try
                 {
                     // Temporarily move existing libs folder
@@ -274,12 +282,30 @@ namespace Updater2
                         Directory.Move(libsPath, oldLibsPath);
                     }
 
-                    File.Delete(exepath + "\\DS4Windows.exe");
-                    File.Delete(exepath + "\\DS4Tool.exe");
-                    File.Delete(exepath + "\\DS4Control.dll");
-                    File.Delete(exepath + "\\DS4Library.dll");
-                    File.Delete(exepath + "\\HidLibrary.dll");
-                    Directory.Delete(exepath + "\\Update Files");
+                    string[] checkFiles = new string[]
+                    {
+                        exepath + "\\DS4Windows.exe",
+                        exepath + "\\DS4Tool.exe",
+                        exepath + "\\DS4Tool.exe",
+                        exepath + "\\DS4Control.dll",
+                        exepath + "\\DS4Library.dll",
+                        exepath + "\\HidLibrary.dll",
+                    };
+
+                    foreach (string checkFile in checkFiles)
+                    {
+                        if (File.Exists(checkFile))
+                        {
+                            File.Delete(checkFile);
+                        }
+                    }
+
+                    string updateFilesDir = exepath + "\\Update Files";
+                    if (Directory.Exists(updateFilesDir))
+                    {
+                        Directory.Delete(updateFilesDir);
+                    }
+
                     string[] updatefiles = Directory.GetFiles(exepath);
                     for (int i = 0, arlen = updatefiles.Length; i < arlen; i++)
                     {
@@ -318,6 +344,13 @@ namespace Updater2
                     }
                 }
 
+                // Grab relative file paths to DLL files in the newer install
+                string[] newDLLFiles = Directory.GetFiles(exepath + "\\Update Files\\DS4Windows", "*.dll", SearchOption.AllDirectories);
+                for (int i = newDLLFiles.Length - 1; i >= 0; i--)
+                {
+                    newDLLFiles[i] = newDLLFiles[i].Replace($"{exepath}\\Update Files\\DS4Windows\\", "");
+                }
+
                 string[] files = Directory.GetFiles(exepath + "\\Update Files\\DS4Windows", "*", SearchOption.AllDirectories);
                 for (int i = files.Length - 1; i >= 0; i--)
                 {
@@ -339,6 +372,16 @@ namespace Updater2
                 if (Directory.Exists(oldLibsPath))
                 {
                     Directory.Delete(oldLibsPath, true);
+                }
+
+                // Remove unused DLLs (in main app folder) from previous install
+                string[] excludedDLLs = oldDLLFiles.Except(newDLLFiles).ToArray();
+                foreach (string dllFile in excludedDLLs)
+                {
+                    if (File.Exists(dllFile))
+                    {
+                        File.Delete(dllFile);
+                    }
                 }
 
                 string ds4winversion = FileVersionInfo.GetVersionInfo(exepath + "\\DS4Windows.exe").FileVersion;
