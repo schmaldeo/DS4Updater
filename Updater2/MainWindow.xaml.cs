@@ -239,7 +239,7 @@ namespace Updater2
                                 {
                                     p.Kill();
                                 }
-                                catch {  }
+                                catch { }
                             }
                         }
 
@@ -292,7 +292,7 @@ namespace Updater2
                         exepath + "\\HidLibrary.dll",
                     };
 
-                    foreach (string checkFile in checkFiles)
+                    foreach(string checkFile in checkFiles)
                     {
                         if (File.Exists(checkFile))
                         {
@@ -486,3 +486,4 @@ namespace Updater2
         }
     }
 }
+
