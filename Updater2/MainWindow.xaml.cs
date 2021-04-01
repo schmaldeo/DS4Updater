@@ -286,7 +286,6 @@ namespace Updater2
                     {
                         exepath + "\\DS4Windows.exe",
                         exepath + "\\DS4Tool.exe",
-                        exepath + "\\DS4Tool.exe",
                         exepath + "\\DS4Control.dll",
                         exepath + "\\DS4Library.dll",
                         exepath + "\\HidLibrary.dll",
