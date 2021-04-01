@@ -10,9 +10,9 @@
   <PropertyGroup>
     <Product>DS4Updater</Product>
     <Copyright>Copyright © Jays2Kings 2014, 2015; Ryochan7 2017, 2018, 2019, 2020, 2021</Copyright>
-    <Version>1.4.7</Version>
-    <AssemblyVersion>1.4.7</AssemblyVersion>
-    <FileVersion>1.4.7</FileVersion>
+    <Version>1.5.0</Version>
+    <AssemblyVersion>1.5.0</AssemblyVersion>
+    <FileVersion>1.5.0</FileVersion>
     <StartupObject>Updater2.App</StartupObject>
   </PropertyGroup>
 
