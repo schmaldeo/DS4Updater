@@ -5,7 +5,6 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
-using System.Reflection;
 using System.Security.Principal;
 using System.Windows;
 using System.Windows.Shell;
@@ -24,7 +23,7 @@ namespace Updater2
         private const string CUSTOM_EXE_CONFIG_FILENAME = "custom_exe_name.txt";
         WebClient wc = new WebClient(), subwc = new WebClient();
         protected string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Windows";
-        string exepath = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
+        string exepath = AppContext.BaseDirectory;
         string version = "0", newversion = "0";
         bool downloading = false;
         private int round = 1;

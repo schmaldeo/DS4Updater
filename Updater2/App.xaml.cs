@@ -15,7 +15,7 @@ namespace Updater2
     /// </summary>
     public partial class App : Application
     {
-        string exepath = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
+        private string exepath = AppContext.BaseDirectory;
         public static bool openingDS4W;
         private string launchExeName;
         private string launchExePath;
@@ -62,7 +62,9 @@ namespace Updater2
             //Console.WriteLine(CultureInfo.CurrentCulture);
             this.Exit += (s, e) =>
                 {
-                    string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+                    string fileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.exe";
+                    string version = Path.Combine(AppContext.BaseDirectory, fileName);
+
                     if (File.Exists(exepath + "\\Update Files\\DS4Windows\\DS4Updater.exe")
                         && FileVersionInfo.GetVersionInfo(exepath + "\\Update Files\\DS4Windows\\DS4Updater.exe").FileVersion.CompareTo(version) != 0)
                     {
