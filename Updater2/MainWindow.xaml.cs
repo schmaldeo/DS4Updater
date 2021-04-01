@@ -462,7 +462,15 @@ namespace Updater2
 
         private void BtnChangelog_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("https://docs.google.com/document/d/1CovpH08fbPSXrC6TmEprzgPwCe0tTjQ_HTFfDotpmxk/edit?usp=sharing");
+            ProcessStartInfo startInfo = new ProcessStartInfo("https://docs.google.com/document/d/1CovpH08fbPSXrC6TmEprzgPwCe0tTjQ_HTFfDotpmxk/edit?usp=sharing");
+            startInfo.UseShellExecute = true;
+            try
+            {
+                using (Process tempProc = Process.Start(startInfo))
+                {
+                }
+            }
+            catch { }
         }
 
         private void BtnOpenDS4_Click(object sender, RoutedEventArgs e)
