@@ -31,9 +31,13 @@ namespace Updater2
             {
                 string temp = e.Args[i];
                 if (temp.Contains("-skipLang"))
+                {
                     mwd.downloadLang = false;
+                }
                 else if (temp.Equals("-autolaunch"))
+                {
                     mwd.autoLaunchDS4W = true;
+                }
                 else if (temp.Equals("-user"))
                 {
                     mwd.forceLaunchDS4WUser = true;

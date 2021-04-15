@@ -9,6 +9,7 @@ namespace Updater2
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.FileName = "explorer.exe";
             startInfo.Arguments = path;
+            startInfo.UseShellExecute = true;
             try
             {
                 using (Process temp = Process.Start(startInfo)) { }
