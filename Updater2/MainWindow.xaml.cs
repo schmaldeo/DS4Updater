@@ -238,7 +238,11 @@ namespace Updater2
                                 {
                                     p.Kill();
                                 }
-                                catch { }
+                                catch
+                                {
+                                    MessageBox.Show("Failed to close DS4Windows. Cannot continue update. Please terminate DS4Windows and run DS4Updater again.");
+                                    this.Close();
+                                }
                             }
                         }
 
@@ -255,7 +259,7 @@ namespace Updater2
                 {
                     label1.Content = "Waiting for DS4Windows to close";
                     processes = Process.GetProcessesByName("DS4Windows");
-                    System.Threading.Thread.Sleep(10);
+                    System.Threading.Thread.Sleep(100);
                 }
 
                 label2.Opacity = 0;
