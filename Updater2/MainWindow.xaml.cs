@@ -413,12 +413,17 @@ namespace Updater2
                     {
                         string current_exe_location = Path.Combine(exepath, "DS4Windows.exe");
                         string current_conf_file_path = Path.Combine(exepath, "DS4Windows.runtimeconfig.json");
+                        string current_deps_file_path = Path.Combine(exepath, "DS4Windows.deps.json");
 
                         string fake_exe_file = Path.Combine(exepath, $"{fake_exe_name}.exe");
                         string fake_conf_file = Path.Combine(exepath, $"{fake_exe_name}.runtimeconfig.json");
+                        string fake_deps_file = Path.Combine(exepath, $"{fake_exe_name}.deps.json");
 
-                        File.Copy(current_exe_location, fake_exe_file, true);
+                        File.Copy(current_exe_location, fake_exe_file, true); // Copy exe file
+
+                        // Copy needed app config and deps files
                         File.Copy(current_conf_file_path, fake_conf_file, true);
+                        File.Copy(current_deps_file_path, fake_deps_file, true);
                     }
                 }
 
