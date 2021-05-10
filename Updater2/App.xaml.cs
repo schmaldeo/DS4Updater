@@ -77,7 +77,8 @@ namespace Updater2
                     File.Move(currentUpdaterPath, tempNewUpdaterPath);
                     //Directory.Delete(exepath + "\\Update Files", true);
 
-                    string tempFilePath = Path.GetTempFileName();
+                    //string tempFilePath = Path.GetTempFileName();
+                    string tempFilePath = Path.Combine(Path.GetTempPath(), "UpdateReplacer.bat");
                     using (StreamWriter w = new StreamWriter(tempFilePath))
                     {
                         w.WriteLine("@echo off"); // Turn off echo
