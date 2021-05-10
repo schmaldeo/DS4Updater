@@ -79,7 +79,8 @@ namespace Updater2
 
                     //string tempFilePath = Path.GetTempFileName();
                     string tempFilePath = Path.Combine(Path.GetTempPath(), "UpdateReplacer.bat");
-                    using (StreamWriter w = new StreamWriter(tempFilePath))
+                    using (StreamWriter w = new StreamWriter(new FileStream(tempFilePath,
+                        FileMode.Create, FileAccess.Write)))
                     {
                         w.WriteLine("@echo off"); // Turn off echo
                         w.WriteLine("@echo Attempting to replace updater, please wait...");
