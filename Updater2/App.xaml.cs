@@ -63,34 +63,43 @@ namespace Updater2
 
         public App()
         {
-            //Console.WriteLine(CultureInfo.CurrentCulture);
+            //Debug.WriteLine(CultureInfo.CurrentCulture);
             this.Exit += (s, e) =>
-                {
-                    string fileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.exe";
-                    string version = Path.Combine(AppContext.BaseDirectory, fileName);
+            {
+                string currentUpdaterPath = Path.Combine(exepath, "Update Files", "DS4Windows", "DS4Updater.exe");
+                string tempNewUpdaterPath = Path.Combine(exepath, "DS4Updater NEW.exe");
 
-                    if (File.Exists(exepath + "\\Update Files\\DS4Windows\\DS4Updater.exe")
-                        && FileVersionInfo.GetVersionInfo(exepath + "\\Update Files\\DS4Windows\\DS4Updater.exe").FileVersion.CompareTo(version) != 0)
+                string fileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.exe";
+                string version = Path.Combine(AppContext.BaseDirectory, fileName);
+                if (File.Exists(exepath + "\\Update Files\\DS4Windows\\DS4Updater.exe")
+                    && FileVersionInfo.GetVersionInfo(exepath + "\\Update Files\\DS4Windows\\DS4Updater.exe").FileVersion.CompareTo(version) != 0)
+                {
+                    File.Move(currentUpdaterPath, tempNewUpdaterPath);
+                    //Directory.Delete(exepath + "\\Update Files", true);
+
+                    string tempFilePath = Path.GetTempFileName();
+                    using (StreamWriter w = new StreamWriter(tempFilePath))
                     {
-                        File.Move(exepath + "\\Update Files\\DS4Windows\\DS4Updater.exe", exepath + "\\DS4Updater NEW.exe");
-                        Directory.Delete(exepath + "\\Update Files", true);
-                        StreamWriter w = new StreamWriter(exepath + "\\UpdateReplacer.bat");
                         w.WriteLine("@echo off"); // Turn off echo
                         w.WriteLine("@echo Attempting to replace updater, please wait...");
                         w.WriteLine("@ping -n 4 127.0.0.1 > nul"); //Its silly but its the most compatible way to call for a timeout in a batch file, used to give the main updater time to cleanup and exit.
                         w.WriteLine("@del \"" + exepath + "\\DS4Updater.exe" + "\"");
                         w.WriteLine("@ren \"" + exepath + "\\DS4Updater NEW.exe" + "\" \"DS4Updater.exe\"");
-                        w.WriteLine("@DEL \"%~f0\""); // Attempt to delete myself without opening a time paradox.
                         w.Close();
-
-                        Process.Start(exepath + "\\UpdateReplacer.bat");
                     }
-                    else if (File.Exists(exepath + "\\DS4Updater NEW.exe"))
-                        File.Delete(exepath + "\\DS4Updater NEW.exe");
 
-                    if (Directory.Exists(exepath + "\\Update Files"))
-                        Directory.Delete(exepath + "\\Update Files", true);
-                };
+                    Process.Start(tempFilePath);
+                }
+                else if (File.Exists(tempNewUpdaterPath))
+                {
+                    File.Delete(tempNewUpdaterPath);
+                }
+
+                if (Directory.Exists(exepath + "\\Update Files"))
+                {
+                    Directory.Delete(exepath + "\\Update Files", true);
+                }
+            };
 
             this.Exit += (s, e) =>
             {
@@ -109,7 +118,7 @@ namespace Updater2
 
             if (mwd.forceLaunchDS4WUser)
             {
-                // Attempt to launch program
+                // Attempt to launch program as a normal user
                 Util.StartProcessInExplorer(finalLaunchExePath);
             }
             else
