@@ -242,6 +242,7 @@ namespace Updater2
                                 {
                                     MessageBox.Show("Failed to close DS4Windows. Cannot continue update. Please terminate DS4Windows and run DS4Updater again.");
                                     this.Close();
+                                    return;
                                 }
                             }
                         }
@@ -259,7 +260,23 @@ namespace Updater2
                 {
                     label1.Content = "Waiting for DS4Windows to close";
                     processes = Process.GetProcessesByName("DS4Windows");
-                    System.Threading.Thread.Sleep(100);
+                    System.Threading.Thread.Sleep(200);
+                }
+
+                // Need to check for presense of HidGuardHelper
+                processes = Process.GetProcessesByName("HidGuardHelper");
+                if (processes.Length > 0)
+                {
+                    label1.Content = "Waiting for HidGuardHelper to close";
+                    System.Threading.Thread.Sleep(5000);
+
+                    processes = Process.GetProcessesByName("HidGuardHelper");
+                    if (processes.Length > 0)
+                    {
+                        MessageBox.Show("HidGuardHelper will not close. Cannot continue update. Please terminate HidGuardHelper and run DS4Updater again.");
+                        this.Close();
+                        return;
+                    }
                 }
 
                 label2.Opacity = 0;
