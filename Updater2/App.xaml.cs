@@ -70,7 +70,9 @@ namespace Updater2
                 string tempNewUpdaterPath = Path.Combine(exedirpath, "DS4Updater NEW.exe");
 
                 string fileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.exe";
-                string version = Path.Combine(AppContext.BaseDirectory, fileName);
+                string filePath = Path.Combine(AppContext.BaseDirectory, fileName);
+                FileVersionInfo fileVersion = FileVersionInfo.GetVersionInfo(filePath);
+                string version = fileVersion.ProductVersion;
                 if (File.Exists(exedirpath + "\\Update Files\\DS4Windows\\DS4Updater.exe")
                     && FileVersionInfo.GetVersionInfo(exedirpath + "\\Update Files\\DS4Windows\\DS4Updater.exe").FileVersion.CompareTo(version) != 0)
                 {
