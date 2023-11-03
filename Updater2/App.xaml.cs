@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 
-namespace Updater2
+namespace DS4Updater
 {
     /// <summary>
     /// Interaction logic for App.xaml

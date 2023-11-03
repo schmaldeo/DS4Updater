@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>DS4W Update.ico</ApplicationIcon>
     <Platforms>x64;x86</Platforms>
@@ -13,7 +13,7 @@
     <Version>1.5.6</Version>
     <AssemblyVersion>1.5.6</AssemblyVersion>
     <FileVersion>1.5.6</FileVersion>
-    <StartupObject>Updater2.App</StartupObject>
+    <StartupObject>DS4Updater.App</StartupObject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

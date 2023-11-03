@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Updater2
+namespace DS4Updater
 {
     class Util
     {

@@ -1,4 +1,4 @@
-﻿<Window x:Name="DS4_Updater" x:Class="Updater2.MainWindow"
+﻿<Window x:Name="DS4_Updater" x:Class="DS4Updater.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="DS4 Updater" Height="110" Width="408.566" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen">

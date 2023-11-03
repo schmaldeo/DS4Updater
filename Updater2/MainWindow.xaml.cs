@@ -1,10 +1,8 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
-using System.Net;
 using System.Security.Principal;
 using System.Windows;
 using System.Windows.Shell;
@@ -12,8 +10,11 @@ using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
 
-namespace Updater2
+namespace DS4Updater
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -21,7 +22,8 @@ namespace Updater2
     public partial class MainWindow : Window
     {
         private const string CUSTOM_EXE_CONFIG_FILENAME = "custom_exe_name.txt";
-        WebClient wc = new WebClient(), subwc = new WebClient();
+        //WebClient wc = new WebClient(), subwc = new WebClient();
+        private HttpClient wc = new HttpClient();
         protected string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Windows";
         string exepath = AppContext.BaseDirectory;
         string version = "0", newversion = "0";
@@ -47,6 +49,8 @@ namespace Updater2
             try
             {
                 File.WriteAllText(exepath + "\\test.txt", "test");
+                // Add a small sleep period as a pre-caution
+                Thread.Sleep(20);
                 File.Delete(exepath + "\\test.txt");
                 return false;
             }
@@ -108,13 +112,7 @@ namespace Updater2
                 }
                 else
                 {
-                    Uri urlv = new Uri("https://raw.githubusercontent.com/Ryochan7/DS4Windows/jay/DS4Windows/newest.txt");
-                    //Sorry other devs, gonna have to find your own server
-                    WebClient wc2 = new WebClient();
-                    downloading = true;
-                    subwc.DownloadFileAsync(urlv, exepath + "\\version.txt");
-                    subwc.DownloadFileCompleted += subwc_DownloadFileCompleted;
-                    label1.Content = "Getting Update info";
+                    StartVersionFileDownload();
                 }
 
                 if (!downloading && version.Replace(',', '.').CompareTo(newversion) != 0)
@@ -122,10 +120,7 @@ namespace Updater2
                     Uri url = new Uri($"https://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
                     sw.Start();
                     outputUpdatePath = Path.Combine(updatesFolder, $"DS4Windows_{newversion}_{arch}.zip");
-                    try { wc.DownloadFileAsync(url, outputUpdatePath); }
-                    catch (Exception e) { label1.Content = e.Message; }
-                    wc.DownloadFileCompleted += wc_DownloadFileCompleted;
-                    wc.DownloadProgressChanged += wc_DownloadProgressChanged;
+                    StartAppArchiveDownload(url, outputUpdatePath);
                 }
                 else if (!downloading)
                 {
@@ -141,28 +136,159 @@ namespace Updater2
             }
         }
 
-        void subwc_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+        private async void StartAppArchiveDownload(Uri url, string outputUpdatePath)
         {
-            newversion = File.ReadAllText(exepath + "\\version.txt");
+            try
+            {
+                bool success = false;
+                using (var downloadStream = new FileStream(outputUpdatePath, FileMode.CreateNew))
+                {
+                    using HttpResponseMessage response = await wc.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                    long contentLen = response.Content.Headers.ContentLength ?? 0;
+                    using (var contentStream = await response.Content.ReadAsStreamAsync())
+                    {
+                        byte[] buffer = new byte[16384];
+                        int bytesRead = 0;
+                        long totalBytesRead = 0;
+                        while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false)) != 0)
+                        {
+                            await downloadStream.WriteAsync(buffer, 0, bytesRead).ConfigureAwait(false);
+                            totalBytesRead += bytesRead;
+                            Application.Current.Dispatcher.BeginInvoke(() =>
+                            {
+                                wc_DownloadProgressChanged(new DS4Updater.CopyProgress(totalBytesRead, contentLen));
+                            });
+                        }
+
+                        if (downloadStream.CanSeek) downloadStream.Position = 0;
+                    }
+
+                    success = response.IsSuccessStatusCode;
+                    response.EnsureSuccessStatusCode();
+                }
+
+                if (success)
+                {
+                    Application.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        wc_DownloadFileCompleted();
+                    });
+                }
+
+                //wc.DownloadFileAsync(url, outputUpdatePath);
+            }
+            catch (Exception e) { label1.Content = e.Message; }
+            //wc.DownloadFileCompleted += wc_DownloadFileCompleted;
+            //wc.DownloadProgressChanged += wc_DownloadProgressChanged;
+        }
+
+        private async void StartVersionFileDownload()
+        {
+            Uri urlv = new Uri("https://raw.githubusercontent.com/Ryochan7/DS4Windows/jay/DS4Windows/newest.txt");
+            //Sorry other devs, gonna have to find your own server
+            //WebClient wc2 = new WebClient();
+            downloading = true;
+
+            label1.Content = "Getting Update info";
+            try
+            {
+                bool success = false;
+                using HttpResponseMessage response = await wc.GetAsync(urlv);
+                response.EnsureSuccessStatusCode();
+                success = response.IsSuccessStatusCode;
+
+                if (success)
+                {
+                    string verPath = Path.Combine(exepath, "version.txt");
+                    using (FileStream fs = new FileStream(verPath, FileMode.CreateNew))
+                    {
+                        await response.Content.CopyToAsync(fs);
+                    }
+
+                    subwc_DownloadFileCompleted();
+                }
+                //subwc.DownloadFileAsync(urlv, exepath + "\\version.txt");
+                //subwc.DownloadFileCompleted += subwc_DownloadFileCompleted;
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+
+        private async void subwc_DownloadFileCompleted()
+        {
+            newversion = File.ReadAllText(Path.Combine(exepath,  "version.txt"));
             newversion = newversion.Trim();
-            File.Delete(exepath + "\\version.txt");
+            File.Delete(Path.Combine(exepath, "version.txt"));
             if (version.Replace(',', '.').CompareTo(newversion) != 0)
             {
                 Uri url = new Uri($"https://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
                 sw.Start();
                 outputUpdatePath = Path.Combine(updatesFolder, $"DS4Windows_{newversion}_{arch}.zip");
-                try { wc.DownloadFileAsync(url, outputUpdatePath); }
-                catch (Exception ec) { label1.Content = ec.Message; }
-                wc.DownloadFileCompleted += wc_DownloadFileCompleted;
-                wc.DownloadProgressChanged += wc_DownloadProgressChanged;
+
+                //wc.DownloadFileAsync(url, outputUpdatePath);
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        bool success = false;
+                        using (var downloadStream = new FileStream(outputUpdatePath, FileMode.CreateNew))
+                        {
+                            using HttpResponseMessage response =
+                                await wc.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                            long contentLen = response.Content.Headers.ContentLength ?? 0;
+                            using (var contentStream = await response.Content.ReadAsStreamAsync())
+                            {
+                                byte[] buffer = new byte[16384];
+                                int bytesRead = 0;
+                                long totalBytesRead = 0;
+                                while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)
+                                           .ConfigureAwait(false)) != 0)
+                                {
+                                    await downloadStream.WriteAsync(buffer, 0, bytesRead).ConfigureAwait(false);
+                                    totalBytesRead += bytesRead;
+                                    Application.Current.Dispatcher.BeginInvoke(() =>
+                                    {
+                                        wc_DownloadProgressChanged(
+                                            new DS4Updater.CopyProgress(totalBytesRead, contentLen));
+                                    });
+                                }
+
+                                if (downloadStream.CanSeek) downloadStream.Position = 0;
+                            }
+
+                            success = response.IsSuccessStatusCode;
+                            response.EnsureSuccessStatusCode();
+                        }
+
+                        if (success)
+                        {
+                            Application.Current.Dispatcher.BeginInvoke(() =>
+                            {
+                                wc_DownloadFileCompleted();
+                            });
+                        }
+                    }
+                    catch (Exception ec)
+                    {
+                        Application.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            label1.Content = ec.Message;
+                        });
+                    }
+                });
+
+                //wc.DownloadFileCompleted += wc_DownloadFileCompleted;
+                //wc.DownloadProgressChanged += wc_DownloadProgressChanged;
             }
             else
             {
                 label1.Content = "DS4Windows is up to date";
                 try
                 {
-                    File.Delete(path + "\\version.txt");
-                    File.Delete(exepath + "\\version.txt");
+                    File.Delete(Path.Combine(path, "version.txt"));
+                    File.Delete(Path.Combine(exepath + "version.txt"));
                 }
                 catch { }
 
@@ -191,11 +317,11 @@ namespace Updater2
 
         Stopwatch sw = new Stopwatch();
 
-        private void wc_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        private void wc_DownloadProgressChanged(DS4Updater.CopyProgress e)
         {
             label2.Opacity = 1;
-            double speed = e.BytesReceived / sw.Elapsed.TotalSeconds;
-            double timeleft = (e.TotalBytesToReceive - e.BytesReceived) / speed;
+            double speed = e.BytesTransferred / sw.Elapsed.TotalSeconds;
+            double timeleft = (e.ExpectedBytes - e.BytesTransferred) / speed;
             if (timeleft > 3660)
                 label2.Content = (int)timeleft / 3600 + "h left";
             else if (timeleft > 90)
@@ -203,20 +329,21 @@ namespace Updater2
             else
                 label2.Content = (int)timeleft + "s left";
 
-            UpdaterBar.Value = e.ProgressPercentage;
+            UpdaterBar.Value = e.PercentComplete * 100.0;
             TaskbarItemInfo.ProgressValue = UpdaterBar.Value / 106d;
             string convertedrev, convertedtotal;
-            if (e.BytesReceived > 1024 * 1024 * 5) convertedrev = (int)(e.BytesReceived / 1024d / 1024d) + "MB";
-            else convertedrev = (int)(e.BytesReceived / 1024d) + "kB";
+            if (e.BytesTransferred > 1024 * 1024 * 5) convertedrev = (int)(e.BytesTransferred / 1024d / 1024d) + "MB";
+            else convertedrev = (int)(e.BytesTransferred / 1024d) + "kB";
 
-            if (e.TotalBytesToReceive > 1024 * 1024 * 5) convertedtotal = (int)(e.TotalBytesToReceive / 1024d / 1024d) + "MB";
-            else convertedtotal = (int)(e.TotalBytesToReceive / 1024d) + "kB";
+            if (e.ExpectedBytes > 1024 * 1024 * 5) convertedtotal = (int)(e.ExpectedBytes / 1024d / 1024d) + "MB";
+            else convertedtotal = (int)(e.ExpectedBytes / 1024d) + "kB";
 
             if (round == 1) label1.Content = "Downloading update: " + convertedrev + " / " + convertedtotal;
-            else label1.Content = "Downloading Laugauge Pack: " + convertedrev + " / " + convertedtotal;
+            else label1.Content = "Downloading Language Pack: " + convertedrev + " / " + convertedtotal;
         }
 
-        private void wc_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+        //private void wc_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+        private async void wc_DownloadFileCompleted()
         {
             sw.Reset();
             string lang = CultureInfo.CurrentCulture.ToString();
@@ -328,7 +455,7 @@ namespace Updater2
                     string[] updatefiles = Directory.GetFiles(exepath);
                     for (int i = 0, arlen = updatefiles.Length; i < arlen; i++)
                     {
-                        if (Path.GetExtension(updatefiles[i]) == ".ds4w")
+                        if (Path.GetExtension(updatefiles[i]) == ".ds4w" && File.Exists(updatefiles[i]))
                             File.Delete(updatefiles[i]);
                     }
                 }
@@ -351,6 +478,9 @@ namespace Updater2
                     File.Delete(path + "\\version.txt");
                 }
                 catch { }
+
+                // Add small sleep timer here as a pre-caution
+                Thread.Sleep(20);
 
                 string[] directories = Directory.GetDirectories(exepath + "\\Update Files\\DS4Windows", "*", SearchOption.AllDirectories);
                 for (int i = directories.Length - 1; i >= 0; i--)
@@ -467,7 +597,21 @@ namespace Updater2
 
                 sw.Start();
                 outputUpdatePath = Path.Combine(updatesFolder, $"DS4Windows_{newversion}_{arch}.zip");
-                try { wc.DownloadFileAsync(url, outputUpdatePath); }
+                try
+                {
+                    bool success = false;
+                    using (var downloadStream = new FileStream(outputUpdatePath, FileMode.CreateNew))
+                    {
+                        using HttpResponseMessage response = await wc.GetAsync(url);
+                        response.EnsureSuccessStatusCode();
+                        success = response.IsSuccessStatusCode;
+                        if (success)
+                        {
+                            await response.Content.CopyToAsync(downloadStream);
+                        }
+                    }
+                    //wc.DownloadFileAsync(url, outputUpdatePath);
+                }
                 catch (Exception ex) { label1.Content = ex.Message; }
                 backup = true;
             }
