@@ -158,7 +158,7 @@ namespace DS4Updater
                                 totalBytesRead += bytesRead;
                                 Application.Current.Dispatcher.BeginInvoke(() =>
                                 {
-                                    wc_DownloadProgressChanged(new DS4Updater.CopyProgress(totalBytesRead, contentLen));
+                                    wc_DownloadProgressChanged(new CopyProgress(totalBytesRead, contentLen));
                                 });
                             }
 
@@ -257,7 +257,7 @@ namespace DS4Updater
                                     Application.Current.Dispatcher.BeginInvoke(() =>
                                     {
                                         wc_DownloadProgressChanged(
-                                            new DS4Updater.CopyProgress(totalBytesRead, contentLen));
+                                            new CopyProgress(totalBytesRead, contentLen));
                                     });
                                 }
 
@@ -326,7 +326,7 @@ namespace DS4Updater
 
         Stopwatch sw = new Stopwatch();
 
-        private void wc_DownloadProgressChanged(DS4Updater.CopyProgress e)
+        private void wc_DownloadProgressChanged(CopyProgress e)
         {
             label2.Opacity = 1;
             double speed = e.BytesTransferred / sw.Elapsed.TotalSeconds;
