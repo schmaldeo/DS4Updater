@@ -43,7 +43,8 @@ namespace DS4Updater
         private const string CUSTOM_EXE_CONFIG_FILENAME = "custom_exe_name.txt";
         //WebClient wc = new WebClient(), subwc = new WebClient();
         private HttpClient wc = new HttpClient();
-        protected string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Windows";
+        protected string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "DS4Windows");
         string exepath = AppContext.BaseDirectory;
         string version = "0", newversion = "0";
         bool downloading = false;
