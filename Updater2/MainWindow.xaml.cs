@@ -195,8 +195,22 @@ namespace DS4Updater
                             wc_DownloadFileCompleted();
                         });
                     }
+                    else
+                    {
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            label1.Content = "Could not download update";
+                        });
+                    }
 
                     //wc.DownloadFileAsync(url, outputUpdatePath);
+                }
+                catch (HttpRequestException)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        label1.Content = "Could not download update";
+                    });
                 }
                 catch (Exception e) { label1.Content = e.Message; }
                 //wc.DownloadFileCompleted += wc_DownloadFileCompleted;
@@ -230,12 +244,23 @@ namespace DS4Updater
 
                         subwc_DownloadFileCompleted();
                     }
+                    else
+                    {
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            label1.Content = "Could not download update";
+                        });
+                    }
                     //subwc.DownloadFileAsync(urlv, exepath + "\\version.txt");
                     //subwc.DownloadFileCompleted += subwc_DownloadFileCompleted;
                 }
                 catch (HttpRequestException e)
                 {
                     Console.WriteLine(e);
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        label1.Content = "Could not download update";
+                    });
                 }
             });
         }
