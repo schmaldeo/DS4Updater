@@ -155,7 +155,7 @@ namespace DS4Updater
             }
         }
 
-        private async void StartAppArchiveDownload(Uri url, string outputUpdatePath)
+        private void StartAppArchiveDownload(Uri url, string outputUpdatePath)
         {
             Task.Run(async () =>
             {
