@@ -137,7 +137,7 @@ namespace DS4Updater
 
                 if (!downloading && version.Replace(',', '.').CompareTo(newversion) != 0)
                 {
-                    Uri url = new Uri($"https://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
+                    Uri url = new Uri($"https://github.com/schmaldeo/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
                     sw.Start();
                     outputUpdatePath = Path.Combine(updatesFolder, $"DS4Windows_{newversion}_{arch}.zip");
                     StartAppArchiveDownload(url, outputUpdatePath);
@@ -221,7 +221,7 @@ namespace DS4Updater
 
         private void StartVersionFileDownload()
         {
-            Uri urlv = new Uri("https://raw.githubusercontent.com/Ryochan7/DS4Windows/jay/DS4Windows/newest.txt");
+            Uri urlv = new Uri("https://raw.githubusercontent.com/schmaldeo/DS4Windows/master/DS4Windows/newest.txt");
             //Sorry other devs, gonna have to find your own server
             downloading = true;
 
@@ -273,7 +273,7 @@ namespace DS4Updater
             File.Delete(Path.Combine(exepath, "version.txt"));
             if (version.Replace(',', '.').CompareTo(newversion) != 0)
             {
-                Uri url = new Uri($"https://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
+                Uri url = new Uri($"https://github.com/schmaldeo/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
                 sw.Start();
                 outputUpdatePath = Path.Combine(updatesFolder, $"DS4Windows_{newversion}_{arch}.zip");
 
@@ -647,7 +647,7 @@ namespace DS4Updater
             }
             else if (!backup)
             {
-                Uri url = new Uri($"https://github.com/Ryochan7/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
+                Uri url = new Uri($"https://github.com/schmaldeo/DS4Windows/releases/download/v{newversion}/DS4Windows_{newversion}_{arch}.zip");
 
                 sw.Start();
                 outputUpdatePath = Path.Combine(updatesFolder, $"DS4Windows_{newversion}_{arch}.zip");
@@ -684,6 +684,7 @@ namespace DS4Updater
 
         private void BtnChangelog_Click(object sender, RoutedEventArgs e)
         {
+            // TODO change
             ProcessStartInfo startInfo = new ProcessStartInfo("https://docs.google.com/document/d/1CovpH08fbPSXrC6TmEprzgPwCe0tTjQ_HTFfDotpmxk/edit?usp=sharing");
             startInfo.UseShellExecute = true;
             try
