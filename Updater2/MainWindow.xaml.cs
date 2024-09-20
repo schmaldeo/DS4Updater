@@ -16,22 +16,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using DS4Updater.Dtos;
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
-using System.Security.Principal;
-using System.Windows;
-using System.Windows.Shell;
-using System.Text.RegularExpressions;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
+using System.Runtime.InteropServices;
+using System.Security.Principal;
+using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Shell;
 
 namespace DS4Updater
 {
@@ -61,7 +62,7 @@ namespace DS4Updater
 
         [DllImport("Shell32.dll")]
         private static extern int SHGetKnownFolderPath(
-        [MarshalAs(UnmanagedType.LPStruct)]Guid rfid, uint dwFlags, IntPtr hToken,
+        [MarshalAs(UnmanagedType.LPStruct)] Guid rfid, uint dwFlags, IntPtr hToken,
         out IntPtr ppszPath);
 
         public bool AdminNeeded()
@@ -83,6 +84,8 @@ namespace DS4Updater
         public MainWindow()
         {
             InitializeComponent();
+
+            wc.DefaultRequestHeaders.Add("User-Agent", "DS4Windows Updater");
 
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
             if (File.Exists(exepath + "\\DS4Windows.exe"))
@@ -221,7 +224,7 @@ namespace DS4Updater
 
         private void StartVersionFileDownload()
         {
-            Uri urlv = new Uri("https://raw.githubusercontent.com/schmaldeo/DS4Windows/master/DS4Windows/newest.txt");
+            Uri urlv = new Uri("https://api.github.com/repos/schmaldeo/DS4Windows/releases/latest");
             //Sorry other devs, gonna have to find your own server
             downloading = true;
 
@@ -237,10 +240,11 @@ namespace DS4Updater
 
                     if (success)
                     {
+                        var gitHubRelease = await response.Content.ReadFromJsonAsync<GitHubRelease>();
                         string verPath = Path.Combine(exepath, "version.txt");
-                        using (FileStream fs = new FileStream(verPath, FileMode.CreateNew))
+                        using (StreamWriter sw = new(verPath, false))
                         {
-                            await response.Content.CopyToAsync(fs);
+                            sw.Write(gitHubRelease.tag_name.Substring(1));
                         }
 
                         subwc_DownloadFileCompleted();
@@ -268,7 +272,7 @@ namespace DS4Updater
 
         private void subwc_DownloadFileCompleted()
         {
-            newversion = File.ReadAllText(Path.Combine(exepath,  "version.txt"));
+            newversion = File.ReadAllText(Path.Combine(exepath, "version.txt"));
             newversion = newversion.Trim();
             File.Delete(Path.Combine(exepath, "version.txt"));
             if (version.Replace(',', '.').CompareTo(newversion) != 0)
@@ -334,7 +338,7 @@ namespace DS4Updater
                 {
                     label1.Content = "DS4Windows is up to date";
                 });
-                
+
                 try
                 {
                     File.Delete(Path.Combine(path, "version.txt"));
@@ -492,7 +496,7 @@ namespace DS4Updater
                         exepath + "\\HidLibrary.dll",
                     };
 
-                    foreach(string checkFile in checkFiles)
+                    foreach (string checkFile in checkFiles)
                     {
                         if (File.Exists(checkFile))
                         {
